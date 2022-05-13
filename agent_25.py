@@ -14,72 +14,90 @@ class Agent:
     def __init__(self):
         self.n_games = 0
         self.epsilon = 0
-        self.gamma = 0.3
+        self.target = 80 # default = 80
+        self.gamma = 0.9 # default = 0.9
         self.block = 20
         self.memory = deque(maxlen = MAX_MEMORY)
-        self.model = Linear_QNet(32, 256, 3) # len(state), hidden_nodes, outputs
+        self.model = Linear_QNet(16, 256, 3) # len(state) = 11, hidden_nodes = 256, outputs =3
         self.trainer = QTrainer(self.model, lr = LR, gamma = self.gamma)
 
     
     def get_state(self, game):
         head = game.snake[0]
         
-        point_1 = Point(head.x+(2*self.block), head.y+(2*self.block))
-        point_2 = Point(head.x+(2*self.block), head.y)
-        point_3 = Point(head.x+(2*self.block), head.y)
-        point_4 = Point(head.x+(2*self.block), head.y)
-        point_5 = Point(head.x+(2*self.block), head.y-(2*self.block))
-        point_6 = Point(head.x+self.block, head.y+(2*self.block))
+        # point_1 = Point(head.x+(2*self.block), head.y+(2*self.block))
+        # point_2 = Point(head.x+(2*self.block), head.y)
+        # point_3 = Point(head.x+(2*self.block), head.y)
+        # point_4 = Point(head.x+(2*self.block), head.y)
+        # point_5 = Point(head.x+(2*self.block), head.y-(2*self.block))
+        # point_6 = Point(head.x+self.block, head.y+(2*self.block))
         point_7 = Point(head.x+self.block, head.y+self.block)
         point_8 = Point(head.x+self.block, head.y)
         point_9 = Point(head.x+self.block, head.y-self.block)
-        point_10 = Point(head.x+self.block, head.y-(2*self.block))
-        point_11 = Point(head.x, head.y+(2*self.block))
+        # point_10 = Point(head.x+self.block, head.y-(2*self.block))
+        # point_11 = Point(head.x, head.y+(2*self.block))
         point_12 = Point(head.x, head.y+self.block)
         point_13 = Point(head.x, head.y-self.block)
-        point_14 = Point(head.x, head.y-(2*self.block))
-        point_15 = Point(head.x-self.block, head.y+(2*self.block))
+        # point_14 = Point(head.x, head.y-(2*self.block))
+        # point_15 = Point(head.x-self.block, head.y+(2*self.block))
         point_16 = Point(head.x-self.block, head.y+self.block)
         point_17 = Point(head.x-self.block, head.y)
         point_18 = Point(head.x-self.block, head.y-self.block)
-        point_19 = Point(head.x-self.block, head.y-(2*self.block))
-        point_20 = Point(head.x-(2*self.block), head.y+(2*self.block))
-        point_21 = Point(head.x-(2*self.block), head.y+self.block)
-        point_22 = Point(head.x-(2*self.block), head.y)
-        point_23 = Point(head.x-(2*self.block), head.y-self.block)
-        point_24 = Point(head.x-(2*self.block), head.y-(2*self.block))
+        # point_19 = Point(head.x-self.block, head.y-(2*self.block))
+        # point_20 = Point(head.x-(2*self.block), head.y+(2*self.block))
+        # point_21 = Point(head.x-(2*self.block), head.y+self.block)
+        # point_22 = Point(head.x-(2*self.block), head.y)
+        # point_23 = Point(head.x-(2*self.block), head.y-self.block)
+        # point_24 = Point(head.x-(2*self.block), head.y-(2*self.block))
 
         dir_l = game.direction == Direction.LEFT
         dir_r = game.direction == Direction.RIGHT
         dir_u = game.direction == Direction.UP
         dir_d = game.direction == Direction.DOWN
 
+        danger_dict = { Direction.LEFT:  [  #point_1,point_2,point_3,point_4,point_5,
+                                            #point_6,
+                                            point_7,point_8,point_9, 
+                                            #point_10,
+                                            #point_11,
+                                            point_12,point_13,
+                                            #point_14,
+                                            #point_15,
+                                            point_16,point_17,point_18
+                                            #,point_19,
+                                            #point_20,point_21,point_22,point_23,point_24
+                                            ],
+                        Direction.DOWN:[    #point_20,point_15,point_11,point_6,point_1,point_21,
+                                            point_16,point_12,point_7,
+                                            #point_2,point_22,
+                                            point_17,point_8,
+                                            #point_3,point_23,
+                                            point_18,point_13,point_9
+                                            #,point_4,point_24,point_19,point_14,point_10,point_5
+                                            ],
+                        Direction.RIGHT:[   #point_24,point_23,point_22,point_21,point_20,point_19,
+                                            point_18,point_17,point_16,
+                                            #point_15,point_14,
+                                            point_13,point_12,
+                                            #point_11,point_10,
+                                            point_9,point_8,point_7
+                                            #,point_6,point_5,point_4,point_3,point_2,point_1
+                                            ],
+                        Direction.UP:[      #point_5,point_10,point_14,point_19,point_24,point_4,
+                                            point_9,point_13,point_18,
+                                            #point_23,point_3,
+                                            point_8,point_17,
+                                            #point_22,point_2,
+                                            point_7,point_12,point_16
+                                            #,point_21,point_1,point_6,point_11,point_15,point_20
+                                            ]
+                        }
+
+        danger = [game.is_collision(x) for x in danger_dict[game.direction]]
+
         state = [
             #dangers
-            game.is_collision(point_1),
-            game.is_collision(point_2),
-            game.is_collision(point_3),
-            game.is_collision(point_4),
-            game.is_collision(point_5),
-            game.is_collision(point_6),
-            game.is_collision(point_7),
-            game.is_collision(point_8),
-            game.is_collision(point_9),
-            game.is_collision(point_10),
-            game.is_collision(point_11),
-            game.is_collision(point_12),
-            game.is_collision(point_13),
-            game.is_collision(point_14),
-            game.is_collision(point_15),
-            game.is_collision(point_16),
-            game.is_collision(point_17),
-            game.is_collision(point_18),
-            game.is_collision(point_19),
-            game.is_collision(point_20),
-            game.is_collision(point_21),
-            game.is_collision(point_22),
-            game.is_collision(point_23),
-            game.is_collision(point_24),
+            *danger,
 
             # move direction
             dir_l,
@@ -112,7 +130,7 @@ class Agent:
         self.trainer.train_step(state, action, reward, next_state, done)
 
     def get_action(self, state):
-        self.epsilon = 5000 - self.n_games
+        self.epsilon = self.target - self.n_games
         final_move = [0,0,0]
 
     

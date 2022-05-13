@@ -8,15 +8,28 @@ Pytorch
 Numpy
 
 
-Files
------
+File Sets
+----------
 
+# Shared by all #
+arial.ttf: font file used in game
+helper.py: Various helper functions
+
+# human implimentation
 Snake.py: Snake game playable by humans, controls are keyboard arrows. Built on pygame
+
+# Original implimentation - shows danger to left, right, up and down, from snakes perspective#
 Snake_ai.py: Snake game for AI to play. Built on pygame
 model.py: Model to learn how to play snake. Uses Pytorch
-helper.py: Various helper functions
 agent.py: Controller for AI game and model
-arial.ttf: font file used in game
+
+# 5*5 implimentation - shows danger in 5*5 box centered on snake head. No perspective#
+Snake_ai_25.py: Snake game for AI to play. Built on pygame
+model.py_25: Model to learn how to play snake. Uses Pytorch
+agent.py_25: Controller for AI game and model
+
+
+
 
 Credits
 -------

@@ -1,4 +1,4 @@
-Snake game build to practice reinforcement learning.
+Snake game build to practice reinforcement learning. Aim is to double score from original implimentation (50 -> 100+).
 
 Requirements
 ------------
@@ -45,7 +45,7 @@ github: https://github.com/python-engineer/snake-ai-pytorch
 Future
 ------
 
-Currently game model has 11 inputs:
+Original game model has 11 inputs:
 * danger straight ahead
 * danger left
 * danger right
@@ -61,7 +61,7 @@ Currently game model has 11 inputs:
 * food down
 
 This limits its ability to learn. It gets stuck at about 50 points, turning into positions with no escape route.
-Next stage is to try and expand its horizons, probably by giving it a 5*5 square view centered upon its head.
+Next stage is to try and expand its horizons, probably by giving it a 5*5 square view centered upon its head as well as adjusting other parameters such as the amount of random choices and the learning rate.
 
 It might be possible to give it a view of the entire board (say 64 * 64) along with its current direction (for 4097 inputs) but this may be too many and I would rather not go in the direction of perfect information.
 
